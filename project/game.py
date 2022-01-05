@@ -14,8 +14,6 @@ class Game:
 
         #self.screen = pygame.display.set_mode((630,450))
         self.screen = pygame.display.set_mode((800,450))
-
-
         #self.screen = pygame.display.set_mode((1000,800))
 
         self.icone = pygame.image.load("./textures/btn/smile.png").convert()
@@ -39,17 +37,17 @@ class Game:
         pygame.display.set_caption("LABYRINTHE - SNK")
 
         # Son du jeu
-        song = pygame.mixer.Sound("./sound/SNK.mp3")
-        song.play()
+        self.song = pygame.mixer.Sound("./sound/SNK.mp3")
+        self.song.play()
 
         # Charger la carte du jeu
-        tmx_data = pytmx.util_pygame.load_pygame('./textures/background/map.tmx')
-        map_data = pyscroll.data.TiledMapData(tmx_data)
+        self.tmx_data = pytmx.util_pygame.load_pygame('./textures/background/map.tmx')
+        map_data = pyscroll.data.TiledMapData(self.tmx_data)
         map_layer = pyscroll.orthographic.BufferedRenderer(map_data, self.screen.get_size())
         map_layer.zoom = 1.5
 
         # Generer un joueur
-        player_position = tmx_data.get_object_by_name("player")
+        player_position = self.tmx_data.get_object_by_name("player")
         self.player = Player(player_position.x, player_position.y)
 
         # Définir une liste qui va stocker les rectangles de collision
@@ -57,7 +55,7 @@ class Game:
 
         self.wayout = []
 
-        for obj in tmx_data.objects:
+        for obj in self.tmx_data.objects:
             if obj.type == "collision":
                 self.walls.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
             if obj.type == "out":
@@ -66,6 +64,14 @@ class Game:
         # Dessiner le groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=8)
         self.group.add(self.player)
+
+        self.timer_font = pygame.font.Font("FrescoStamp.ttf", 38)
+        self.timer_sec = 60
+        self.timer_text = self.timer_font.render("01:00", True, (240, 0, 32))
+
+        self.timer = pygame.USEREVENT + 1                                                
+        pygame.time.set_timer(self.timer, 1000)
+
 
 
     def handle_input(self):
@@ -98,21 +104,23 @@ class Game:
                 sprite.move_back()
 
     def start(self):
-
+        self.screen.blit(self.background, (0,0))
 
         self.screen.blit(self.banner, self.banner_rect)
                 #self.screen.blit(self.banner, (0,0))
         self.screen.blit(self.play_button, self.play_button_rect)
 
-        for event in pygame.event.get():
-            #print(pygame.mouse.get_pos())
-            if event.type == pygame.MOUSEBUTTONDOWN:
+        for event in pygame.event.get():         
                 
-                # verification pour savoir si la souris est en collision avec le bouton
-                if self.play_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    
-                    #pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            # verification pour savoir si la souris est en collision avec le bouton
+            if self.play_button_rect.collidepoint(pygame.mouse.get_pos()):                    
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                self.play_button = pygame.image.load("./textures/btn/start_select.png")
+                if event.type == pygame.MOUSEBUTTONDOWN:
                     self.is_playing = True
+            else:
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+                self.play_button = pygame.image.load("./textures/btn/start.png")
 
     def win(self):
         self.group.update()
@@ -120,12 +128,18 @@ class Game:
         #Vérification de collision
         for sprite in self.group.sprites():
             if sprite.feet.collidelist(self.wayout) > -1:
-                self.is_playing = False
+                #self.is_playing = False
 
-                tmx_data = pytmx.util_pygame.load_pygame('./textures/background/map.tmx')
-                player_position = tmx_data.get_object_by_name("player")
+                player_position = self.tmx_data.get_object_by_name("player")
                 self.player = Player(player_position.x, player_position.y)
-        #pygame.display.flip()
+
+                # Centrer la caméra sur le joueur
+                self.group.center(self.player.rect.center)
+                self.group.draw(self.screen)
+
+
+                #self.song.stop()
+        pygame.display.flip()
 
 
     def run(self):
@@ -164,7 +178,6 @@ class Game:
 
             # Rafraîchissement de l'écran
             pygame.display.flip()
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     launched = False
