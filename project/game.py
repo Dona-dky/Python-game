@@ -18,6 +18,8 @@ class Game:
 
         #self.screen = pygame.display.set_mode((1000,800))
 
+        self.icone = pygame.image.load("./textures/btn/smile.png").convert()
+        pygame.display.set_icon(self.icone)
         # Chargement et collage du fond
         self.background = pygame.image.load("./textures/background/background.jpg")
 
@@ -53,9 +55,13 @@ class Game:
         # Définir une liste qui va stocker les rectangles de collision
         self.walls = []
 
+        self.wayout = []
+
         for obj in tmx_data.objects:
             if obj.type == "collision":
                 self.walls.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+            if obj.type == "out":
+                self.wayout.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
 
         # Dessiner le groupe de calques
         self.group = pyscroll.PyscrollGroup(map_layer=map_layer, default_layer=8)
@@ -93,20 +99,33 @@ class Game:
 
     def start(self):
 
+
+        self.screen.blit(self.banner, self.banner_rect)
+                #self.screen.blit(self.banner, (0,0))
+        self.screen.blit(self.play_button, self.play_button_rect)
+
         for event in pygame.event.get():
-            print(pygame.mouse.get_pos())
+            #print(pygame.mouse.get_pos())
             if event.type == pygame.MOUSEBUTTONDOWN:
                 
-                #if self.play_button.collidepoint(pygame.mouse.get_pos()):
-                if self.play_button.collidepoint(pygame.mouse.get_pos()):
-                #if self.play_button.get_rect().collidepoint(pygame.mouse.get_pos()):
+                # verification pour savoir si la souris est en collision avec le bouton
+                if self.play_button_rect.collidepoint(pygame.mouse.get_pos()):
                     
                     #pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-                    self.is_playing = True 
-            
-                # verification pour savoir si la souris est en collision avec le bouton
-                #if self.play_button.collidepoint(pygame.mouse.get_pos()):
-                    #self.is_playing = True   
+                    self.is_playing = True
+
+    def win(self):
+        self.group.update()
+
+        #Vérification de collision
+        for sprite in self.group.sprites():
+            if sprite.feet.collidelist(self.wayout) > -1:
+                self.is_playing = False
+
+                tmx_data = pytmx.util_pygame.load_pygame('./textures/background/map.tmx')
+                player_position = tmx_data.get_object_by_name("player")
+                self.player = Player(player_position.x, player_position.y)
+        #pygame.display.flip()
 
 
     def run(self):
@@ -136,12 +155,12 @@ class Game:
                 self.group.center(self.player.rect.center)
                 self.group.draw(self.screen)
 
+                # Si le joueur gagne
+                self.win()
+
             else:
-                self.start()
-                self.screen.blit(self.banner, self.banner_rect)
-                #self.screen.blit(self.banner, (0,0))
-                self.screen.blit(self.play_button, self.play_button_rect)
                 
+                self.start()
 
             # Rafraîchissement de l'écran
             pygame.display.flip()
