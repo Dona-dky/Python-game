@@ -47,8 +47,8 @@ class Game:
         map_layer.zoom = 1.5
 
         # Generer un joueur
-        player_position = self.tmx_data.get_object_by_name("player")
-        self.player = Player(player_position.x, player_position.y)
+        self.player_position = self.tmx_data.get_object_by_name("player")
+        self.player = Player(self.player_position.x, self.player_position.y)
 
         # Définir une liste qui va stocker les rectangles de collision
         self.walls = []
@@ -122,6 +122,13 @@ class Game:
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
                 self.play_button = pygame.image.load("./textures/btn/start.png")
 
+    
+    def switch_position(self):
+        #self.player_spawn_position = self.tmx_data.get_object_by_name("spawn")
+        #self.player = Player(self.player_spawn_position.x, self.player_spawn_position.y)
+        self.launched = False
+
+    
     def win(self):
         self.group.update()
 
@@ -129,17 +136,10 @@ class Game:
         for sprite in self.group.sprites():
             if sprite.feet.collidelist(self.wayout) > -1:
                 #self.is_playing = False
-
-                player_position = self.tmx_data.get_object_by_name("player")
-                self.player = Player(player_position.x, player_position.y)
-
-                # Centrer la caméra sur le joueur
-                self.group.center(self.player.rect.center)
-                self.group.draw(self.screen)
-
+                self.switch_position()
 
                 #self.song.stop()
-        pygame.display.flip()
+        
 
 
     def run(self):
@@ -147,11 +147,11 @@ class Game:
         clock = pygame.time.Clock()
 
         #Boucle du jeu
-        launched = True
+        self.launched = True
 
         
 
-        while launched:
+        while self.launched:
 
             self.screen.blit(self.background, (0,0))
 
@@ -180,7 +180,7 @@ class Game:
             pygame.display.flip()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    launched = False
+                    self.launched = False
 
             clock.tick(60)
 
