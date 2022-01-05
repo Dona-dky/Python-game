@@ -674,7 +674,7 @@
   <object id="143" type="collision" x="786" y="239" width="15.5" height="31"/>
   <object id="144" type="collision" x="496" y="113" width="15.6667" height="111"/>
  </objectgroup>
- <objectgroup id="15" name="Movements">
+ <objectgroup id="15" name="Movements" visible="0">
   <object id="145" name="titan_path1" x="46" y="96" width="18.6667" height="17.3333"/>
   <object id="146" name="titan_path2" x="128.152" y="160.182" width="16.3636" height="16.1818"/>
   <object id="147" name="titan_path3" x="239.152" y="224.333" width="16.3636" height="16.1818"/>

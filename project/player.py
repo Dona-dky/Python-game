@@ -19,7 +19,6 @@ class Player(Animation):
 
         self.feet = pygame.Rect(0, 0, self.rect.width * 0.5, 12)
         self.old_position = self.position.copy()
-        
 
         self.health = 100
         self.max_health = 100

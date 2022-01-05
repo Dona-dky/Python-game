@@ -1,4 +1,5 @@
 import pygame
+from pygame.constants import MOUSEBUTTONDOWN
 import pytmx
 import pyscroll
 
@@ -8,9 +9,30 @@ class Game:
 
     def __init__(self):
 
-        self.screen = pygame.display.set_mode((630,450))
-        #self.screen = pygame.display.set_mode((500,300))
+        #definir si le jeu a commencé ou pas
+        self.is_playing = False
+
+        #self.screen = pygame.display.set_mode((630,450))
+        self.screen = pygame.display.set_mode((800,450))
+
+
         #self.screen = pygame.display.set_mode((1000,800))
+
+        # Chargement et collage du fond
+        self.background = pygame.image.load("./textures/background/background.jpg")
+
+        self.banner = pygame.image.load("./textures/Logo_game.png")
+        self.banner_rect = self.banner.get_rect()
+        self.banner_rect.x = self.screen.get_width() / 10.5
+
+        self.play_button = pygame.image.load("./textures/btn/start.png")
+        #self.play_button = pygame.transform.scale(self.play_button, (120, 50))
+        self.play_button_rect = self.play_button.get_rect()
+        self.play_button_rect.x = self.screen.get_width() / 2.5
+        self.play_button_rect.y = self.screen.get_height() / 1.8
+
+        self.quit_button = pygame.image.load("./textures/btn/quit.png")
+
 
         pygame.display.set_caption("LABYRINTHE - SNK")
 
@@ -67,7 +89,24 @@ class Game:
         #Vérification de collision
         for sprite in self.group.sprites():
             if sprite.feet.collidelist(self.walls) > -1:
-                sprite.move_back()        
+                sprite.move_back()
+
+    def start(self):
+
+        for event in pygame.event.get():
+            print(pygame.mouse.get_pos())
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                
+                #if self.play_button.collidepoint(pygame.mouse.get_pos()):
+                if self.play_button.collidepoint(pygame.mouse.get_pos()):
+                #if self.play_button.get_rect().collidepoint(pygame.mouse.get_pos()):
+                    
+                    #pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+                    self.is_playing = True 
+            
+                # verification pour savoir si la souris est en collision avec le bouton
+                #if self.play_button.collidepoint(pygame.mouse.get_pos()):
+                    #self.is_playing = True   
 
 
     def run(self):
@@ -77,22 +116,32 @@ class Game:
         #Boucle du jeu
         launched = True
 
+        
+
         while launched:
-            self.player.save_location()
 
-            # Afficher la touche dans la console si print("x") 
-            self.handle_input()
+            self.screen.blit(self.background, (0,0))
 
-            # Mettre à jour le déplacement du joueur
-            self.update()
+            if self.is_playing:
 
-            # Centrer la caméra sur le joueur
-            self.group.center(self.player.rect.center)
-            self.group.draw(self.screen)
+                self.player.save_location()
 
-            # Chargement et collage du fond
-            #background = pygame.image.load("./textures/background/foot.jpg").convert()
-            #self.screen.blit(background, (0,0))
+                # Afficher la touche dans la console si print("x") 
+                self.handle_input()
+
+                # Mettre à jour le déplacement du joueur
+                self.update()
+
+                # Centrer la caméra sur le joueur
+                self.group.center(self.player.rect.center)
+                self.group.draw(self.screen)
+
+            else:
+                self.start()
+                self.screen.blit(self.banner, self.banner_rect)
+                #self.screen.blit(self.banner, (0,0))
+                self.screen.blit(self.play_button, self.play_button_rect)
+                
 
             # Rafraîchissement de l'écran
             pygame.display.flip()
