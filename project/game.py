@@ -37,8 +37,8 @@ class Game:
         pygame.display.set_caption("LABYRINTHE - SNK")
 
         # Son du jeu
-        self.song = pygame.mixer.Sound("./sound/SNK.mp3")
-        self.song.play()
+        self.song = pygame.mixer.Sound("./sound/SNK_song.mp3")
+        self.song.play(loops=1, maxtime=0, fade_ms=0)
 
         # Charger la carte du jeu
         self.tmx_data = pytmx.util_pygame.load_pygame('./textures/background/map.tmx')
@@ -95,6 +95,9 @@ class Game:
             self.player.move_right()
             self.player.change_animation('right')
 
+        if pressed[pygame.K_ESCAPE]:
+            print("pause...")
+
     def update(self):
         self.group.update()
 
@@ -127,6 +130,8 @@ class Game:
         #self.player_spawn_position = self.tmx_data.get_object_by_name("spawn")
         #self.player = Player(self.player_spawn_position.x, self.player_spawn_position.y)
         self.launched = False
+
+        pygame.quit()
 
     
     def win(self):
@@ -179,6 +184,7 @@ class Game:
             # Rafraîchissement de l'écran
             pygame.display.flip()
             for event in pygame.event.get():
+                        
                 if event.type == pygame.QUIT:
                     self.launched = False
 
