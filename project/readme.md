@@ -1,12 +1,6 @@
-<h3 align="center" style="color: yellow;">🎮 Le jeu du pendu 🎮</h3>
+<h3 align="center" style="color: yellow;">Labyrinthe - SNK</h3>
 
-## 💼 The project
-
-### 📝 Description :
-
-Le jeu du pendu is a game allowing 2 players to guess a word by entering a letter one by one.
-
-### 👩🏾‍💻 Built With :
+### Built With :
 
 This project was carried out with the use of the following languages :
 
@@ -14,9 +8,7 @@ This project was carried out with the use of the following languages :
 * Pygame
 
 
-## 📺 Getting Started
-
-### 💾 Installation :
+### Installation :
 
 - Install Python3 : `https://www.python.org/downloads/ `
 
